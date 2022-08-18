@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Question {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  text String
+
+  possibleAnswers PossibleAnswer[]
+
+  questionnaireId String
+  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id])
+
+  @@map("question")
+}
+
+type PossibleAnswer {
+  id              String
+  text            String
+  isCorrectAnswer Boolean
+  points          Int
+}
+
+model Questionnaire {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+
+  // This should be updated any time the questions, name or description change
+  // to reset the submissions
+  version Int @default(0)
+
+  questions   Question[]
+  submissions Submission[]
+
+  evaluations Evaluation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("questionnaire")
+}
+
+type Evaluation {
+  minPoints Int
+  maxPoints Int
+  notes     String
+  passes    Boolean
+}
+
+type UserAnswer {
+  questionId String
+  question   String
+  answerId   String
+  answer     String
+  points     Int
+
+  // Float is a very unreliable field to use in MongoDB as the precision
+  // can be lost. We should use Decimal, however, support is not ready at
+  // the moment. See https://github.com/prisma/prisma/issues/12637
+  // In a real world application, there's a way around this, I built a way around it,
+  // however, for the purpose of this test, we'll just use Float
+  timeElapsedToAnswer Float
+}
+
+model Submission {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+
+  // We will identify a user by this user name since we're not implementing any
+  // authentication
+  userName String @unique
+
+  // We will use this field to record the version field of the Questionnaire object
+  // the reason is that the submission is progressive and can be saved, however, we will
+  // reset the submission if the questionnaire's data changed
+  questionnaireVersion Int
+
+  questionnaireId String
+  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id])
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  completed   Boolean   @default(false)
+
+  // We will denormalize the submissions to avoid cases where the questions are modified
+  // This will ensure that the submission remains intact and the user's answers cannot 
+  answers UserAnswer[]
+  points Int @default(0)
+  evaluation Evaluation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("submissions")
+}

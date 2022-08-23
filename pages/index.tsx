@@ -1,10 +1,15 @@
-import { Box } from '@chakra-ui/react'
+import Home from 'components/Home'
+import Page from 'layout/Page'
 import type { NextPage } from 'next'
 
-const Home: NextPage = () => {
+const HomePage: NextPage = () => {
   return (
-    <Box>Hello</Box>
+    <Page
+      title={'Test Your General Knowledge'}
+      description={'Test for teamway'}>
+      <Home />
+    </Page>
   )
 }
 
-export default Home
+export default HomePage

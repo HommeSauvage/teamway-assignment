@@ -8,6 +8,7 @@ import { enhancedFetch } from 'lib/fetch'
 import { useRouter } from 'next/router'
 import { FC, FormEventHandler, useState } from 'react'
 import { ZodIssue } from 'zod'
+import { COOKIES_AUTH_TOKEN } from 'lib/constants'
 
 type Props = {
   questionnaire: Questionnaire | null
@@ -67,7 +68,7 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
       description: `You've got some unfinished business here`
     })
 
-    Cookies.set('auth', response.data.body.authToken, {
+    Cookies.set(COOKIES_AUTH_TOKEN, response.data.body.authToken, {
       expires: 1
     })
     

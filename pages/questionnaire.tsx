@@ -1,5 +1,5 @@
 import Page from 'layout/Page'
-import Questionnaire from 'components/Questionnaire'
+import Questionnaire from 'components/Submission'
 
 const QuestionnairePage = () => {
   return (

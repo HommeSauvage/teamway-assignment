@@ -2,19 +2,20 @@ import type { User } from '@prisma/client'
 import type { NextApiHandler } from 'next'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { authenticate } from './auth'
-import { ERROR_UNKNOWN, ERROR_UNSUPPORTED_METHOD } from './constants'
+import { ERROR_UNKNOWN, ERROR_UNSUPPORTED_METHOD, ERROR_VALIDATION } from './constants'
 import { makeError, StandardError } from './error'
 import { err, Result } from './r'
+import { ZodError } from 'zod'
 
-type AuthenticatedNextApiRequest = NextApiRequest & {
+export type AuthenticatedNextApiRequest = NextApiRequest & {
   user: User
 }
-type AuthenticatedRequestHandler<S = any, E = StandardError> = (req: AuthenticatedNextApiRequest, res: NextApiResponse) => Result<S, E> | Promise<Result<S, E>>
-type UnauthenticatedRequestHandler<S = any, E = StandardError> = (req: NextApiRequest, res: NextApiResponse) => Result<S, E> | Promise<Result<S, E>>
+export type AuthenticatedRequestHandler<S = any, E = StandardError> = (req: AuthenticatedNextApiRequest, res: NextApiResponse) => Result<S, E> | Promise<Result<S, E>>
+export type UnauthenticatedRequestHandler<S = any, E = StandardError> = (req: NextApiRequest, res: NextApiResponse) => Result<S, E> | Promise<Result<S, E>>
 
 type Method = typeof METHODS[number]
 type CreateRequestHandlerOptions = {
-  [M in Method]: {
+  [M in Method]?: {
     authenticate: true
     handler: AuthenticatedRequestHandler
   }  | {
@@ -32,12 +33,11 @@ const handleResponse = (responseData: Result<any, any>, res: NextApiResponse) =>
   
   if(responseData.ok) {
     status = 200
-  } else if(!status) {
-    status = 500
+  } else {
+    status = status || 500
   }
 
-  
-  res.status(statusCode)
+  res.status(status)
   res.json(data)
 }
 
@@ -71,11 +71,24 @@ export const createRequestHandler = (options: CreateRequestHandlerOptions) => {
       // Handle response
       return handleResponse(await handlerDetails.handler(req as any, res), res)
     } catch(e) {
-      return handleResponse(err(makeError({
+      let error = makeError({
         code: ERROR_UNKNOWN,
         message: 'Something wrong happened',
+      })
+
+      if(e instanceof ZodError) {
+        error = makeError({
+          code: ERROR_VALIDATION,
+          statusCode: 422,
+          message: e.message || 'The submitted data is not valid',
+          validationError: e.issues
+        })
+      } else {
+        // report these errors
+        console.error('An error happened', e)
       }
-    )), res)
+
+      return handleResponse(err(error), res)
     }
   }
 

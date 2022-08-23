@@ -1,7 +1,12 @@
 import { StandardError } from './error'
 import { err, ok, Result } from './r'
 
-export const enhancedFetch = async <S, E = StandardError>(url: string, init?: RequestInit): Promise<Result<S, E>> => {
+type Wrapper<T> = {
+  status: number
+  body: T
+}
+
+export const enhancedFetch = async <S, E = StandardError>(url: string, init?: RequestInit): Promise<Result<Wrapper<S>, Wrapper<E>>> => {
   const result = await fetch(url, {
     ...init,
     headers: {
@@ -27,5 +32,5 @@ export const enhancedFetch = async <S, E = StandardError>(url: string, init?: Re
 
   const respondWith = status < 300 && status >= 200 ? ok : err
 
-  return respondWith(data) as unknown as Result<S, E>
+  return respondWith(data)
 }

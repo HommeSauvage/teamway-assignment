@@ -73,7 +73,6 @@ type UserAnswer {
 
 model Submission {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
 
   // We will identify a user by this user name since we're not implementing any
   // authentication
@@ -83,7 +82,7 @@ model Submission {
   // We will use this field to record the version field of the Questionnaire object
   // the reason is that the submission is progressive and can be saved, however, we will
   // reset the submission if the questionnaire's data changed
-  questionnaireVersion Int
+  questionnaireVersion Int @default(0)
 
   questionnaireId String
   questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id])
@@ -92,6 +91,8 @@ model Submission {
   completedAt DateTime?
   completed   Boolean   @default(false)
 
+  currentStep Int @default(0)
+  
   // We will denormalize the submissions to avoid cases where the questions are modified
   // This will ensure that the submission remains intact and the user's answers cannot 
   answers    UserAnswer[]

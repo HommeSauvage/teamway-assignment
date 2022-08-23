@@ -1,9 +1,8 @@
 
-const appUrl = process.env.APP_URL
+const appUrl = process.env.NEXT_PUBLIC_APP_URL
 
 export const config = {
   appUrl,
-  apiUrl: process.env.API_URL || `${appUrl}/api`,
-  secretToken: process.env.API_KEY || 'secret',
+  apiUrl: process.env.NEXT_PUBLIC_API_URL || `${appUrl}/api`,
 } as const 
 

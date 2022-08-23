@@ -77,7 +77,8 @@ model Submission {
 
   // We will identify a user by this user name since we're not implementing any
   // authentication
-  userName String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
   // We will use this field to record the version field of the Questionnaire object
   // the reason is that the submission is progressive and can be saved, however, we will
@@ -93,12 +94,25 @@ model Submission {
 
   // We will denormalize the submissions to avoid cases where the questions are modified
   // This will ensure that the submission remains intact and the user's answers cannot 
-  answers UserAnswer[]
-  points Int @default(0)
+  answers    UserAnswer[]
+  points     Int          @default(0)
   evaluation Evaluation?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("submissions")
+}
+
+model User {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userName String @unique
+
+  submissions Submission[]
+  
+  // of course, we won't store this in here, it should have its own model
+  // but for the sake of the test, we will store it in here
+  authToken String @unique
+
+  @@map("users")
 }

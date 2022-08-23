@@ -1,5 +1,6 @@
 export type StandardError<M = any> = {
   code: string
+  statusCode?: number
   message?: string
   metadata?: M
 }

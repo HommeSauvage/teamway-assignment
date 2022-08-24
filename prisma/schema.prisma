@@ -68,11 +68,11 @@ type UserAnswer {
   // the moment. See https://github.com/prisma/prisma/issues/12637
   // In a real world application, there's a way around this, I built a way around it,
   // however, for the purpose of this test, we'll just use Float
-  timeElapsedToAnswer Float
+  timeElapsedToAnswer Float?
 }
 
 model Submission {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
   // We will identify a user by this user name since we're not implementing any
   // authentication
@@ -92,12 +92,15 @@ model Submission {
   completed   Boolean   @default(false)
 
   currentStep Int @default(0)
-  
+
   // We will denormalize the submissions to avoid cases where the questions are modified
   // This will ensure that the submission remains intact and the user's answers cannot 
-  answers    UserAnswer[]
-  points     Int          @default(0)
-  evaluation Evaluation?
+  answers UserAnswer[]
+  points  Int          @default(0)
+
+  // We leave it nullable to express that the submission is not complete
+  pass            Boolean?
+  evaluationNotes String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -110,7 +113,7 @@ model User {
   userName String @unique
 
   submissions Submission[]
-  
+
   // of course, we won't store this in here, it should have its own model
   // but for the sake of the test, we will store it in here
   authToken String @unique

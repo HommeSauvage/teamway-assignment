@@ -1,6 +1,6 @@
 import type { User } from '@prisma/client'
 import type { NextApiHandler } from 'next'
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { authenticate } from './auth'
 import { ERROR_UNKNOWN, ERROR_UNSUPPORTED_METHOD, ERROR_VALIDATION } from './constants'
 import { makeError, StandardError } from './error'
@@ -18,8 +18,8 @@ type CreateRequestHandlerOptions = {
   [M in Method]?: {
     authenticate: true
     handler: AuthenticatedRequestHandler
-  }  | {
-    authenticate?: false
+  } | {
+    authenticate: false
     handler: UnauthenticatedRequestHandler
   }
 }

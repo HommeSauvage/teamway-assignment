@@ -21,8 +21,6 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
   const router = useRouter()
   const [issues, setIssues] = useState<ZodIssue[] | undefined>()
   const userNameIssues = issues?.filter((i) => i.path.includes('userName'))
-  console.log('issues', issues)
-  console.log('userNameIssues', userNameIssues)
 
   // useCallback is not necessary in here as we have only one state we're changing
   // and not much to worry about. However, in a prod app with mission critical components
@@ -49,7 +47,7 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
         title: 'Something went wrong',
         description: `${response.data.body.message || `Error code: ${response.data.body.code}`}`
       })
-      console.log('response.data.body.validationError??', response.data.body)
+
       setIssues(response.data.body.validationError)
       return
     }

@@ -1,5 +1,5 @@
 import prisma from 'lib/prisma'
-import { UnauthenticatedRequestHandler } from 'lib/servet'
+import { UnauthenticatedRequestHandler } from 'lib/server'
 import { ok, Result } from 'lib/r'
 import { StandardError } from 'lib/error'
 import { Questionnaire } from '@prisma/client'

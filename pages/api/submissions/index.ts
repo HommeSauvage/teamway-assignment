@@ -1,5 +1,5 @@
 import { ok } from 'lib/r'
-import { createRequestHandler } from 'lib/servet'
+import { createRequestHandler } from 'lib/server'
 import create from 'api-functions/submissions/create'
 
 const handler = createRequestHandler({

@@ -1,4 +1,4 @@
-import { createRequestHandler } from 'lib/servet'
+import { createRequestHandler } from 'lib/server'
 import create from 'api-functions/questionnaires/create'
 
 const handler = createRequestHandler({

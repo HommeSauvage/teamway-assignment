@@ -1,5 +1,5 @@
 import prisma from 'lib/prisma'
-import { UnauthenticatedRequestHandler } from 'lib/servet'
+import { UnauthenticatedRequestHandler } from 'lib/server'
 import { z } from 'zod'
 import { nanoid } from 'nanoid'
 import { ok, Result } from 'lib/r'

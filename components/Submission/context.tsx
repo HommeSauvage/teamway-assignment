@@ -1,9 +1,10 @@
 import { useToast } from '@chakra-ui/react'
 import { config } from 'config'
-import type { SubmissionWithQuestionnaire } from 'frontend-types'
+import type { Submission, SubmissionWithQuestionnaire } from 'frontend-types'
 import type { StandardError } from 'lib/error'
 import { enhancedFetch } from 'lib/fetch'
 import { useSWRFetcher } from 'lib/swr-fetcher'
+import { useAuth } from 'lib/use-auth'
 import { useRouter } from 'next/router'
 import { createContext, FC, PropsWithChildren, useCallback, useEffect, useMemo } from 'react'
 import useSWR from 'swr'
@@ -33,9 +34,10 @@ export const SubmissionProvider: FC<PropsWithChildren<SubmissionContextProps>> =
   const submissionFetcher = useSWRFetcher<SubmissionWithQuestionnaire>()
   const router = useRouter()
   const toast = useToast()
+  const { authToken } = useAuth()
   const submissionId: string | undefined = router.query.id ? `${router.query.id}` : initialSubmissionId
 
-  const { data: submission, error } = useSWR<SubmissionWithQuestionnaire, StandardError>(submissionId ? `${config.apiUrl}/submissions/${submissionId}` : null, submissionFetcher, {
+  const { data: submission, error, mutate } = useSWR<SubmissionWithQuestionnaire, StandardError>(submissionId ? `${config.apiUrl}/submissions/${submissionId}` : null, submissionFetcher, {
     fallbackData: initialSubmission
   })
 
@@ -53,7 +55,7 @@ export const SubmissionProvider: FC<PropsWithChildren<SubmissionContextProps>> =
 
   const currentStep: number = isValidStep(router.query.id) ? +router.query.id : initialStep || 0
 
-  const submitAnswer = useCallback(async () => {
+  const submitAnswer = useCallback(async (questionId: string, answerId: string, timeElapsedToAnswer?: number) => {
     if(!submissionId) {
       toast({
         status: 'error',
@@ -61,8 +63,36 @@ export const SubmissionProvider: FC<PropsWithChildren<SubmissionContextProps>> =
       })
       return 
     }
-    await enhancedFetch(`${config.apiUrl}/submissions/${submissionId}`)
-  }, [submissionId, toast])
+    
+    const submissionResult = await enhancedFetch<Submission>(`${config.apiUrl}/submissions/${submissionId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify({
+        questionId,
+        answerId,
+        timeElapsedToAnswer
+      })
+    })
+
+    if(submissionResult.err) {
+      toast({
+        status: 'error',
+        title: 'Something wrong happened',
+        description: submissionResult.data.body.message || `Error code: ${submissionResult.data.body.code}`
+      })
+      return
+    }
+
+    // Update using SWR technique
+    // @ts-expect-error
+    mutate({
+      ...submission,
+      ...submissionResult.data.body
+    })
+
+  }, [submissionId, toast, authToken, submission, mutate])
 
   const context: SubmissionContextState = useMemo(() => ({
     submissionId,

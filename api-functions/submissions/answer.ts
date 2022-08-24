@@ -84,9 +84,6 @@ const handler: AuthenticatedRequestHandler = async (req): Promise<Result<Submiss
       message: (e as Error).message || 'Something wrong happened during the submissions. Please try again.'
     }))
   }
-  
-
-
 }
 
 export default handler

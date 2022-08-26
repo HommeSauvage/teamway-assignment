@@ -76,10 +76,11 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
       setIsCreated(true)
       router.push(`/submissions/${response.data.body.submissionId}`)
     } catch(e) {
+      console.error('Error', e)
       toast({
         status: 'error',
         title: 'Something went wrong',
-        description: `${(e as Error).message || `Error code: ${response.data.body.code}`}`
+        description: `${(e as Error).message || `Something nasty happened, not sure what, but we logged the error and we'll fix it soon.`}`
       })
     } finally {
       setIsLoading(false)

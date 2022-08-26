@@ -25,7 +25,8 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     props: {
       // Next will serializet this
       questionnaire: JSON.parse(JSON.stringify(questionnaire)) as Questionnaire | null,
-    }
+    },
+    revalidate: 1
   }
 }
 

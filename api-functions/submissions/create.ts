@@ -11,6 +11,7 @@ export type Response = {
   submissionId: string
   authToken: string
   step: number
+  completed: boolean
 }
 
 const Body = z.object({
@@ -40,7 +41,6 @@ const handler: UnauthenticatedRequestHandler = async (req): Promise<Result<Respo
     include: {
       submissions: {
         where: {
-          completed: false,
           questionnaireId,
         }
       }
@@ -67,7 +67,8 @@ const handler: UnauthenticatedRequestHandler = async (req): Promise<Result<Respo
     isNew: newUserId === user.id,
     authToken,
     submissionId: submission.id,
-    step: submission.currentStep
+    step: submission.currentStep,
+    completed: submission.completed
   })
 }
 

@@ -62,7 +62,7 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
       toast({
         status: 'success',
         title: 'Welcome back!',
-        description: `You've got some unfinished business here`
+        description: response.data.body.completed ? `You've already completed the questionnaire` : `You've got some unfinished business here`
       })
     }
 

@@ -21,6 +21,7 @@ type SubmissionContextState = {
   isSubmitting: boolean
   questions: Question[]
   error?: StandardError
+  isValidating: boolean
   submitAnswer: (questionId: string, answerId: string, timeElapsedToAnswer?: number) => void
 }
 
@@ -28,7 +29,8 @@ const defaultContext: SubmissionContextState = {
   currentStep: 0,
   submitAnswer: () => {},
   questions: [],
-  isSubmitting: false
+  isSubmitting: false,
+  isValidating: false
 }
 
 export const SubmissionContext = createContext<SubmissionContextState>(defaultContext)
@@ -39,7 +41,7 @@ export const SubmissionProvider: FC<PropsWithChildren<SubmissionContextProps>> =
   const toast = useToast()
   const { authToken } = useAuth()
   const submissionId: string | undefined = router.query.id ? `${router.query.id}` : initialSubmissionId
-  const { data: submission, error, mutate } = useSWR<SubmissionWithQuestionnaire, StandardError>(submissionId ? `${config.apiUrl}/submissions/${submissionId}` : null, submissionFetcher, {
+  const { data: submission, error, mutate, isValidating } = useSWR<SubmissionWithQuestionnaire, StandardError>(submissionId ? `${config.apiUrl}/submissions/${submissionId}` : null, submissionFetcher, {
     fallbackData: initialSubmission,
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -108,7 +110,8 @@ export const SubmissionProvider: FC<PropsWithChildren<SubmissionContextProps>> =
     error,
     isSubmitting,
     submitAnswer,
-  }), [submission, submissionId, currentStep, error, submitAnswer, isSubmitting])
+    isValidating,
+  }), [submission, submissionId, currentStep, error, submitAnswer, isSubmitting, isValidating])
 
   return (
     <SubmissionContext.Provider value={context}>

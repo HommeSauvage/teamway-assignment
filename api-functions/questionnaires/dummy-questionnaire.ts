@@ -6,6 +6,32 @@ const id = () => `${new ObjectId()}`
 export const DUMMY_QUESTIONNAIRE_CREATE: Prisma.QuestionnaireCreateInput = {
   name: 'IQ Test',
   description: 'This is an IQ test',
+  evaluations: [
+    {
+      minPoints: 0,
+      maxPoints: 10,
+      passes: false,
+      notes: `I'm sure you did it on purpose, right? ... rrright?`
+    },
+    {
+      minPoints: 10,
+      maxPoints: 30,
+      passes: true,
+      notes: `Look over here, we've got an Einstein in the make`
+    },
+    {
+      minPoints: 30,
+      maxPoints: 41,
+      passes: true,
+      notes: `You're one of the top 1% of smart people on earth`
+    },
+    {
+      minPoints: 41,
+      maxPoints: 1000,
+      passes: true,
+      notes: `Something you should know, we're building a statue to honor your extreme, once in a millennium, intelligence`
+    }
+  ],
   questions: {
     createMany: {
       data: [
@@ -123,8 +149,9 @@ export const DUMMY_QUESTIONNAIRE_CREATE: Prisma.QuestionnaireCreateInput = {
               points: 10,
             }
           ]
-        }
+        },
+        
       ]
     }
-  }
+  },
 }

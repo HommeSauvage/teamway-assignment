@@ -17,8 +17,8 @@ const Page: FC<PropsWithChildren<Props>> = ({ children, title, description }) =>
 
       <Box>
         <Center 
-          mt={20} 
-          mb={25}>
+          pt={20} 
+          pb={25}>
             <Text
               fontSize={{
                 base: 28,

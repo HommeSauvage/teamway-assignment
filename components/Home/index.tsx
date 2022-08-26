@@ -17,6 +17,8 @@ type Props = {
 const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
   const [questionnaire, setQuestionnaire] = useState(providedQuestionnaire)
   const [userName, setUserName] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [isCreated, setIsCreated] = useState(false)
   const toast = useToast()
   const router = useRouter()
   const [issues, setIssues] = useState<ZodIssue[] | undefined>()
@@ -28,49 +30,60 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
   const submit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     setIssues(undefined)
+    setIsLoading(true)
 
-    if(!questionnaire) {
-      return
-    }
-
-    const response = await enhancedFetch<Response>(`${config.apiUrl}/submissions`, {
-      method: 'POST',
-      body: JSON.stringify({
-        userName,
-        questionnaireId: questionnaire.id
+    try {
+      if(!questionnaire) {
+        return
+      }
+  
+      const response = await enhancedFetch<Response>(`${config.apiUrl}/submissions`, {
+        method: 'POST',
+        body: JSON.stringify({
+          userName,
+          questionnaireId: questionnaire.id
+        })
       })
-    })
-
-    if(response.err) {
+  
+      if(response.err) {
+        toast({
+          status: 'error',
+          title: 'Something went wrong',
+          description: `${response.data.body.message || `Error code: ${response.data.body.code}`}`
+        })
+  
+        setIssues(response.data.body.validationError)
+        return
+      }
+  
+      if(response.data.body.isNew) {
+        toast({
+          status: 'success',
+          title: 'All good!',
+          description: `Your usrname is now saved and you will be able to continue the test just by providing your username.`
+        })
+      } else {
+        toast({
+          status: 'success',
+          title: 'Welcome back!',
+          description: response.data.body.completed ? `You've already completed the questionnaire` : `You've got some unfinished business here`
+        })
+      }
+  
+      Cookies.set(COOKIES_AUTH_TOKEN, response.data.body.authToken, {
+        expires: 1
+      })
+      setIsCreated(true)
+      router.push(`/submissions/${response.data.body.submissionId}`)
+    } catch(e) {
       toast({
         status: 'error',
         title: 'Something went wrong',
-        description: `${response.data.body.message || `Error code: ${response.data.body.code}`}`
+        description: `${(e as Error).message || `Error code: ${response.data.body.code}`}`
       })
-
-      setIssues(response.data.body.validationError)
-      return
+    } finally {
+      setIsLoading(false)
     }
-
-    if(response.data.body.isNew) {
-      toast({
-        status: 'success',
-        title: 'All good!',
-        description: `Your usrname is now saved and you will be able to continue the test just by providing your username.`
-      })
-    } else {
-      toast({
-        status: 'success',
-        title: 'Welcome back!',
-        description: response.data.body.completed ? `You've already completed the questionnaire` : `You've got some unfinished business here`
-      })
-    }
-
-    Cookies.set(COOKIES_AUTH_TOKEN, response.data.body.authToken, {
-      expires: 1
-    })
-    
-    router.push(`/submissions/${response.data.body.submissionId}`)
   }
 
   const seed = async () => {
@@ -148,7 +161,7 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
             
           </Box>
 
-          <Button type={'submit'}>
+          <Button type={'submit'} isLoading={isLoading} disabled={isCreated}>
             Start the test
           </Button>
         </Grid>

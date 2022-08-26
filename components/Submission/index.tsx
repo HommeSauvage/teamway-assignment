@@ -36,6 +36,7 @@ const Submission = () => {
       </Fade>
 
       {!submission?.completed && (<Button 
+        mt={4}
         isDisabled={!selectedAnswer}
         onClick={() => submitAnswer(currentQuestion.id, selectedAnswer!, getTimeElapsedSince(startTime))}
         isLoading={isSubmitting}>Next</Button>)}

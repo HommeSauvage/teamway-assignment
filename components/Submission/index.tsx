@@ -1,12 +1,42 @@
-import { Box } from '@chakra-ui/react'
-import { FC } from 'react'
-import { SubmissionContextProps, SubmissionProvider } from './context'
+import { Box, Button, Fade, Slide } from '@chakra-ui/react'
+import Container from 'components/basic/Container'
+import { FC, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { SubmissionContext, SubmissionContextProps, SubmissionProvider } from './context'
+import QuestionBox from './QuestionBox'
+import { getTimeElapsedSince } from './utils'
 
 const Submission = () => {
+  const { questions, submitAnswer, currentStep, isSubmitting } = useContext(SubmissionContext)
+  const [localStep, setLocalStep] = useState(currentStep)
+  const [startTime, setStartTime] = useState(new Date)
+  const [selectedAnswer, setSelectedAnswer] = useState<string | undefined>()
+  const fadeRef = useCallback((node: HTMLDivElement) => {
+    if(!node) {
+      setLocalStep((s) => s+1)
+      setStartTime(new Date)
+      return
+    }
+  }, [])
+  // Context fixes the currentStep and we're sure we won't have some out of bounds value in here
+  const currentQuestion = questions[currentStep]
+
   return (
-    <Box>
-      Submission
-    </Box>
+    <Container>
+      <Fade 
+        ref={fadeRef} 
+        in={localStep === currentStep} 
+        unmountOnExit={true}>
+        {currentQuestion && <QuestionBox 
+          question={currentQuestion} 
+          onSelectAnswer={setSelectedAnswer} 
+          selectedAnswer={selectedAnswer} />}
+      </Fade>
+
+      <Button 
+        isDisabled={!selectedAnswer}
+        onClick={() => submitAnswer(currentQuestion.id, selectedAnswer!, getTimeElapsedSince(startTime))}
+        isLoading={isSubmitting}>Next</Button>
+    </Container>
   )
 }
 

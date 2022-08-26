@@ -72,6 +72,7 @@ const handler: AuthenticatedRequestHandler = async (req): Promise<Result<Submiss
         points,
         completed,
         completedAt: completed ? new Date() : null,
+        currentStep: answers.length,
         ...evaluation,
       }
     }))

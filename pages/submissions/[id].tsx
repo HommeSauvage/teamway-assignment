@@ -39,7 +39,16 @@ export const getStaticPaths: GetStaticPaths = async ({}) => {
 }
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
-  const submission = await prisma.submission.findFirst({
+  if(!params?.id || Array.isArray(params.id)) {
+    return {
+      props: {}
+    }
+  }
+
+  const submission = await prisma.submission.findUnique({
+    where: {
+      id: params.id
+    },
     include: {
       questionnaire: {
         include: {

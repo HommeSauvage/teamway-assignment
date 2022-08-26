@@ -58,19 +58,19 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
         title: 'All good!',
         description: `Your usrname is now saved and you will be able to continue the test just by providing your username.`
       })
+    } else {
+      toast({
+        status: 'success',
+        title: 'Welcome back!',
+        description: `You've got some unfinished business here`
+      })
     }
-
-    toast({
-      status: 'success',
-      title: 'Welcom back!',
-      description: `You've got some unfinished business here`
-    })
 
     Cookies.set(COOKIES_AUTH_TOKEN, response.data.body.authToken, {
       expires: 1
     })
     
-    router.push(`/submissions/${response.data.body.submissionId}?step=${response.data.body.step}`)
+    router.push(`/submissions/${response.data.body.submissionId}`)
   }
 
   const seed = async () => {

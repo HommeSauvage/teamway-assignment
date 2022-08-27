@@ -19,3 +19,12 @@ Note, for the `DATABASE_URL` environment variable, create a `.env.development.lo
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can also preview the work online at: https://aladin-assignment.vercel.app
+
+## Directions
+Start by opening `pages/index.ts`, the component uses SSG to preload the question.
+You can login with any username, the progress is saved by username.
+The pages/api folder contains some light api code, just entrypoints, the bulk of the API resides inside `api-functions` folder.
+
+## Note
+No code has been reused from any of my projects, some elements are not thouroughly built.
+For tests, I have built only 3 tests for now, just as an example. If a complete test of the project is necessary, do let me know and I'll do all the tests with coverage.

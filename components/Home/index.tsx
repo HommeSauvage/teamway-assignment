@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, FormErrorMessage, FormHelperText, Grid, Input, Text, useToast } from '@chakra-ui/react'
+import { Box, Button, FormControl, FormErrorMessage, Grid, Input, Text, useToast } from '@chakra-ui/react'
 import type { Questionnaire } from 'frontend-types'
 import type { Response } from 'api-functions/submissions/create'
 import Container from 'components/basic/Container'
@@ -11,7 +11,7 @@ import { ZodIssue } from 'zod'
 import { COOKIES_AUTH_TOKEN } from 'lib/constants'
 
 type Props = {
-  questionnaire: Questionnaire | null
+  questionnaire?: Questionnaire
 }
 
 const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
@@ -60,7 +60,7 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
         toast({
           status: 'success',
           title: 'All good!',
-          description: `Your usrname is now saved and you will be able to continue the test just by providing your username.`
+          description: `Your username is now saved and you will be able to continue the test just by providing your username.`
         })
       } else {
         toast({
@@ -117,7 +117,10 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
           Hello there. It seems that there are no questionnaires. 
           Here&apos;s a question for you: Did you forget to seed the DB?.
         </Text>
-        <Button mt={10} onClick={seed}>
+        <Button
+          data-testid={'seed-questionnaire'}
+          mt={10} 
+          onClick={seed}>
           Seed the questionnaire
         </Button>
       </Container>
@@ -149,6 +152,7 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
           <Box>
             <FormControl isInvalid={!!userNameIssues?.length}>
               <Input
+                data-testid={'username-input'}
                 w={300}
                 value={userName} 
                 placeholder={'Enter your existing/new username'}
@@ -162,7 +166,11 @@ const Home: FC<Props> = ({ questionnaire: providedQuestionnaire }) => {
             
           </Box>
 
-          <Button type={'submit'} isLoading={isLoading} disabled={isCreated}>
+          <Button
+            data-testid={'start-questionnaire'}
+            type={'submit'} 
+            isLoading={isLoading} 
+            disabled={isCreated}>
             Start the test
           </Button>
         </Grid>

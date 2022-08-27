@@ -28,7 +28,7 @@ const QuestionBox: FC<Props> = ({ question, onSelectAnswer, selectedAnswer }) =>
       gap={'1'}
       {...group}>
       
-      <Box my={4} fontSize={'lg'}>
+      <Box my={4} fontSize={'lg'} data-testid={'question'}>
         {question.text}
       </Box>
 

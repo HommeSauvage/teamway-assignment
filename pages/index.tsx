@@ -5,7 +5,7 @@ import prisma from 'lib/prisma'
 import type { GetStaticProps, NextPage } from 'next'
 
 type Props = {
-  questionnaire: Questionnaire  | null
+  questionnaire?: Questionnaire
 }
 
 const HomePage: NextPage<Props> = ({ questionnaire }) => {
@@ -24,7 +24,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   return {
     props: {
       // Next will serializet this
-      questionnaire: JSON.parse(JSON.stringify(questionnaire)) as Questionnaire | null,
+      questionnaire: questionnaire ? JSON.parse(JSON.stringify(questionnaire)) as Questionnaire : undefined,
     },
     revalidate: 1
   }
